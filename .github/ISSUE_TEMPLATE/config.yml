@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Kopolart website
+    url: https://kopolart.ir
+    about: Browse the color tools and the full API guide.
+  - name: Free HEX to color API article
+    url: https://kopolart.ir/posts/free-hex-to-color-api
+    about: Read the announcement and usage notes (Persian).

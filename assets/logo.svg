@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Kopolart Color API</title>
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="0.5" stop-color="#818cf8"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#0a0f1f"/>
+  <rect x="1" y="1" width="254" height="254" rx="55" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+  <g>
+    <circle cx="212" cy="128" r="13" fill="#ef4444"/>
+    <circle cx="198.7" cy="177.7" r="13" fill="#f97316"/>
+    <circle cx="160" cy="216" r="13" fill="#f59e0b"/>
+    <circle cx="128" cy="212" r="13" fill="#84cc16"/>
+    <circle cx="96" cy="216" r="13" fill="#10b981"/>
+    <circle cx="57.3" cy="177.7" r="13" fill="#14b8a6"/>
+    <circle cx="44" cy="128" r="13" fill="#06b6d4"/>
+    <circle cx="57.3" cy="78.3" r="13" fill="#3b82f6"/>
+    <circle cx="96" cy="40" r="13" fill="#6366f1"/>
+    <circle cx="128" cy="44" r="13" fill="#8b5cf6"/>
+    <circle cx="160" cy="40" r="13" fill="#a855f7"/>
+    <circle cx="198.7" cy="78.3" r="13" fill="#ec4899"/>
+  </g>
+  <circle cx="128" cy="128" r="52" fill="#0a0f1f" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
+  <text x="128" y="147" text-anchor="middle" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="46" font-weight="700" fill="url(#accent)">K</text>
+</svg>

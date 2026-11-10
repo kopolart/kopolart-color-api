@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node tooling used for spec validation
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Local preview and logs
+*.log
+.cache/

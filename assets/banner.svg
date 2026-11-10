@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="300" viewBox="0 0 1280 300" role="img" aria-labelledby="bannerTitle bannerDesc">
+  <title id="bannerTitle">Kopolart Color API</title>
+  <desc id="bannerDesc">Free color intelligence for developers: bilingual names, RGB, HSL, CMYK, wavelength, purity and luminance.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b18"/>
+      <stop offset="0.55" stop-color="#0c1224"/>
+      <stop offset="1" stop-color="#101a33"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="0.5" stop-color="#818cf8"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#6366f1" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowPink" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ec4899" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="300" fill="url(#bg)"/>
+  <rect width="1280" height="300" fill="url(#grid)"/>
+  <circle cx="1080" cy="40" r="280" fill="url(#glow)"/>
+  <circle cx="1180" cy="300" r="220" fill="url(#glowPink)"/>
+
+  <rect x="0.5" y="0.5" width="1279" height="299" rx="0" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
+
+  <g font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif">
+    <text x="72" y="104" fill="#64748b" font-size="13" font-weight="600" letter-spacing="4.5">KOPOLART · FREE PUBLIC API</text>
+    <text x="72" y="163" fill="#e6ecf7" font-size="52" font-weight="700" letter-spacing="-0.5">Kopolart <tspan fill="url(#accent)">Color API</tspan></text>
+    <text x="72" y="200" fill="#9aa7bd" font-size="19" font-weight="400">Names, RGB, HSL, CMYK, wavelength, purity and luminance — in one request.</text>
+    <text x="72" y="244" fill="#64748b" font-size="12.5" font-weight="600" letter-spacing="2.6">NO API KEY · 25 REQ/MIN · OPENAPI 3.1 · JSON</text>
+  </g>
+
+  <g opacity="0.5" filter="url(#soft)">
+    <circle cx="1058" cy="160" r="86" fill="#818cf8" fill-opacity="0.35"/>
+  </g>
+
+  <g>
+    <circle cx="1154.0" cy="160.0" r="15" fill="#ef4444"/>
+    <circle cx="1141.1" cy="208.0" r="15" fill="#f97316"/>
+    <circle cx="1106.0" cy="243.1" r="15" fill="#f59e0b"/>
+    <circle cx="1058.0" cy="256.0" r="15" fill="#84cc16"/>
+    <circle cx="1010.0" cy="243.1" r="15" fill="#10b981"/>
+    <circle cx="974.9" cy="208.0" r="15" fill="#14b8a6"/>
+    <circle cx="962.0" cy="160.0" r="15" fill="#06b6d4"/>
+    <circle cx="974.9" cy="112.0" r="15" fill="#3b82f6"/>
+    <circle cx="1010.0" cy="76.9" r="15" fill="#6366f1"/>
+    <circle cx="1058.0" cy="64.0" r="15" fill="#8b5cf6"/>
+    <circle cx="1106.0" cy="76.9" r="15" fill="#a855f7"/>
+    <circle cx="1141.1" cy="112.0" r="15" fill="#ec4899"/>
+    <circle cx="1058" cy="160" r="58" fill="#0a0f1f" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1.5"/>
+    <text x="1058" y="179" text-anchor="middle" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="50" font-weight="700" fill="url(#accent)">K</text>
+  </g>
+</svg>

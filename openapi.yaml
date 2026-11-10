@@ -1,0 +1,716 @@
+openapi: 3.1.0
+
+info:
+  title: Kopolart Color API
+  version: 1.0.0
+  summary: Free color intelligence for developers
+  description: |
+    A free, keyless HTTP API that converts any HEX color into a complete color
+    profile: Persian and English names, RGB, HSL, CMYK, dominant wavelength,
+    excitation purity and relative luminance. It also exposes complementary,
+    analogous, similar-color and similar-palette discovery endpoints.
+
+    ## Conventions
+
+    - **HEX input**: 3 or 6 hexadecimal digits, case-insensitive, optional leading `#`.
+      A literal `#` in a URL must be percent-encoded as `%23`; omitting it is simpler.
+    - **No authentication**: no API key, token or account is required.
+    - **Rate limit**: 25 requests per minute per IP on color profile endpoints.
+    - **Caching**: color profiles and complements are cached server-side for 24 hours;
+      similar-color and similar-palette results for 7 days.
+    - **Errors**: `400` returns a ProblemDetails object; `429` and `500` return
+      the website's HTML error page. Inspect the status code.
+  termsOfService: https://kopolart.ir
+  contact:
+    name: KopolArt
+    url: https://kopolart.ir
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+  x-logo:
+    url: ./assets/logo.svg
+    altText: Kopolart Color API
+
+externalDocs:
+  description: Free HEX to color API guide
+  url: https://kopolart.ir/posts/free-hex-to-color-api
+
+servers:
+  - url: https://kopolart.ir
+    description: Production
+
+security: []
+
+tags:
+  - name: Color
+    description: Color profiles and color-theory relationships.
+  - name: Discovery
+    description: Similar colors and palettes from the Kopolart catalog.
+  - name: Compatibility
+    description: Legacy endpoints kept for backward compatibility.
+
+paths:
+  /api/color/{hex}:
+    get:
+      tags:
+        - Color
+      operationId: getColorProfile
+      summary: Get a full color profile
+      description: |
+        Returns the normalized HEX, Persian and English names, RGB, HSL, CMYK,
+        dominant wavelength, excitation purity and relative luminance.
+
+        Names come from a curated catalog. When the exact color is not present,
+        the nearest catalog color is used and may be decorated with a descriptive
+        adjective such as "Pale", "Pastel", "Deep" or "Vivid".
+      parameters:
+        - $ref: '#/components/parameters/Hex'
+      responses:
+        '200':
+          description: The color profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColorProfile'
+              examples:
+                red:
+                  summary: Red (#FF0000)
+                  value:
+                    color: '#FF0000'
+                    persianName: 'قرمز'
+                    englishName: 'Red'
+                    rgb:
+                      r: 255
+                      g: 0
+                      b: 0
+                    hsl:
+                      h: 0
+                      s: 100
+                      l: 50
+                    cmyk:
+                      c: 0
+                      m: 100
+                      y: 100
+                      k: 0
+                    wavelength: 611.3
+                    purity: 91.7
+                    brightness: 21.3
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      x-rate-limit: 25 requests per minute per IP
+      x-cache-ttl: 24 hours
+
+  /api/complementary-color/{hex}:
+    get:
+      tags:
+        - Color
+      operationId: getComplementaryColor
+      summary: Get complementary and analogous colors
+      description: |
+        Returns the catalog's best complementary color plus a nearest analogous
+        alternative, together with perceptual distance, contrast, a 50/50 RGB mix
+        and a Persian temperature label for each.
+      parameters:
+        - $ref: '#/components/parameters/Hex'
+      responses:
+        '200':
+          description: Complementary and analogous color details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplementaryColor'
+              examples:
+                steelBlue:
+                  summary: Steel blue (#3366CC)
+                  value:
+                    compHex: 'f8b500'
+                    compName: 'زرد طلایی'
+                    compNameEn: 'Golden Yellow'
+                    compNearHex: '40a2e3'
+                    compNearName: 'آبی فیروزه‌ای'
+                    compNearNameEn: 'Turquoise Blue'
+                    compDistance: '80.9'
+                    compContrast: '14.1'
+                    compMix: '#958E66'
+                    compTemp: 'گرم'
+                    compTempVal: '44'
+                    nearDistance: '20.6'
+                    nearContrast: '9.1'
+                    nearMix: '#3A84D8'
+                    nearTemp: 'سرد'
+                    nearTempVal: '204'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      x-rate-limit: 25 requests per minute per IP
+      x-cache-ttl: 24 hours
+
+  /api/similar-colors/{hex}:
+    get:
+      tags:
+        - Discovery
+      operationId: getSimilarColors
+      summary: Find similar catalog colors
+      description: |
+        Returns up to three catalog colors nearest to the input, ordered by
+        perceptual closeness. Image and page URLs are relative to
+        `https://kopolart.ir`.
+      parameters:
+        - $ref: '#/components/parameters/Hex'
+      responses:
+        '200':
+          description: Up to three similar colors.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 3
+                items:
+                  $ref: '#/components/schemas/ColorSummary'
+              examples:
+                red:
+                  summary: Colors similar to #FF0000
+                  value:
+                    - span: 'FF1818'
+                      title: 'رنگ قرمز (Red)'
+                      image: '/images/color-swatches/thumbnails/red-color-ff1818.jpg'
+                      url: '/colors/red-color-ff1818'
+                      captionImage: 'رنگ قرمز با کد FF1818'
+                      dateTime: '0001-01-01T00:00:00'
+                    - span: 'ED3500'
+                      title: 'رنگ نارنجی‌قرمز (Orange Red)'
+                      image: '/images/color-swatches/thumbnails/orange-red-color-ed3500.jpg'
+                      url: '/colors/orange-red-color-ed3500'
+                      captionImage: 'رنگ نارنجی‌قرمز با کد ED3500'
+                      dateTime: '0001-01-01T00:00:00'
+                    - span: 'ED3F27'
+                      title: 'رنگ قرمز اسکارلت (Scarlet Red)'
+                      image: '/images/color-swatches/thumbnails/scarlet-red-color-ed3f27.jpg'
+                      url: '/colors/scarlet-red-color-ed3f27'
+                      captionImage: 'رنگ قرمز اسکارلت با کد ED3F27'
+                      dateTime: '0001-01-01T00:00:00'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      x-rate-limit: No dedicated rate limit; cache results on your side.
+      x-cache-ttl: 7 days
+
+  /api/similar-palettes/{hex}:
+    get:
+      tags:
+        - Discovery
+      operationId: getSimilarPalettes
+      summary: Find similar palettes
+      description: |
+        Returns up to three palettes nearest to the supplied color. The path
+        accepts a single HEX value; comma-separated sequences return `400`.
+        If no palette is close enough, a set of popular palettes is returned.
+
+        The `url` field of a palette is a slug **without** a leading slash;
+        prepend `https://kopolart.ir/` to build the page URL.
+      parameters:
+        - $ref: '#/components/parameters/Hex'
+      responses:
+        '200':
+          description: Up to three similar palettes.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 3
+                items:
+                  $ref: '#/components/schemas/PaletteSummary'
+              examples:
+                red:
+                  summary: Palettes near #FF0000
+                  value:
+                    - span: '3,326'
+                      title: 'پالت رنگ نسکافه ای، قهوه‌ای، کرم و آبی نفتی'
+                      image: '/images/palettes/thumbnails/brown-petrol-blue-palette-865131.jpg'
+                      url: 'brown-petrol-blue-palette-865131'
+                      captionImage: 'پالت رنگ نسکافه ای، قهوه‌ای، کرمی و آبی نفتی'
+                      dateTime: '0001-01-01T00:00:00'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      x-rate-limit: No dedicated rate limit; cache results on your side.
+      x-cache-ttl: 7 days
+
+  /api-color/{hex}:
+    get:
+      tags:
+        - Compatibility
+      operationId: getLegacyColorStrings
+      summary: Get a compact legacy color profile
+      description: |
+        A shorter, string-only payload kept for backward compatibility. Note the
+        different prefix: `/api-color` with a hyphen.
+      parameters:
+        - $ref: '#/components/parameters/Hex'
+      responses:
+        '200':
+          description: Compact color profile as strings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegacyColorProfile'
+              examples:
+                red:
+                  summary: Red (#F00)
+                  value:
+                    message1: 'Pure Vibrant Red'
+                    message2: '611'
+                    message3: '91.7'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      x-rate-limit: 25 requests per minute per IP
+      x-cache-ttl: 24 hours
+
+components:
+  parameters:
+    Hex:
+      name: hex
+      in: path
+      required: true
+      description: |
+        3- or 6-digit hexadecimal color, case-insensitive. A leading `#` is
+        accepted only if percent-encoded as `%23`; omitting it is recommended.
+      schema:
+        type: string
+        pattern: '^#?[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$'
+        examples:
+          - 'ff0000'
+          - '0af'
+
+  responses:
+    BadRequest:
+      description: The HEX value is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            invalidHex:
+              summary: Invalid HEX value
+              value:
+                type: 'https://tools.ietf.org/html/rfc9110#section-15.5.1'
+                title: 'Bad Request'
+                status: 400
+                traceId: '00-7f1f424232f4f6653689d6c924918dc0-174c508a684e2a67-00'
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    TooManyRequests:
+      description: |
+        The rate limit was exceeded (25 requests per minute per IP on this
+        endpoint). The response is the website's HTML error page, which is not
+        part of the JSON API contract; back off and retry after a minute.
+    InternalServerError:
+      description: |
+        An unexpected server error occurred. The response is the website's error
+        page, which is not part of the JSON API contract.
+
+  schemas:
+    ColorProfile:
+      type: object
+      description: Full profile of a single color.
+      required:
+        - color
+        - persianName
+        - englishName
+        - rgb
+        - hsl
+        - cmyk
+        - wavelength
+        - purity
+        - brightness
+      properties:
+        color:
+          type: string
+          description: Normalized HEX, uppercase and prefixed with `#`.
+          examples:
+            - '#FF0000'
+        persianName:
+          type: string
+          description: Persian color name. May be empty when no catalog match exists.
+          examples:
+            - 'قرمز'
+        englishName:
+          type: string
+          description: English color name. May be empty when no catalog match exists.
+          examples:
+            - 'Red'
+        rgb:
+          $ref: '#/components/schemas/Rgb'
+        hsl:
+          $ref: '#/components/schemas/Hsl'
+        cmyk:
+          $ref: '#/components/schemas/Cmyk'
+        wavelength:
+          type: number
+          description: |
+            Dominant wavelength in nanometres, rounded to one decimal. Achromatic
+            colors (greys, white, black) return `0`.
+          examples:
+            - 611.3
+        purity:
+          type: number
+          description: Excitation purity as a percentage (`0–100`), one decimal.
+          minimum: 0
+          maximum: 100
+          examples:
+            - 91.7
+        brightness:
+          type: number
+          description: Relative luminance as a percentage (`0–100`), one decimal.
+          minimum: 0
+          maximum: 100
+          examples:
+            - 21.3
+
+    Rgb:
+      type: object
+      description: RGB channels.
+      required:
+        - r
+        - g
+        - b
+      properties:
+        r:
+          type: integer
+          minimum: 0
+          maximum: 255
+          examples:
+            - 255
+        g:
+          type: integer
+          minimum: 0
+          maximum: 255
+          examples:
+            - 0
+        b:
+          type: integer
+          minimum: 0
+          maximum: 255
+          examples:
+            - 0
+
+    Hsl:
+      type: object
+      description: HSL representation. Saturation and lightness are percentages.
+      required:
+        - h
+        - s
+        - l
+      properties:
+        h:
+          type: number
+          description: Hue in degrees (`0–360`).
+          minimum: 0
+          maximum: 360
+          examples:
+            - 0
+        s:
+          type: number
+          description: Saturation percentage (`0–100`).
+          minimum: 0
+          maximum: 100
+          examples:
+            - 100
+        l:
+          type: number
+          description: Lightness percentage (`0–100`).
+          minimum: 0
+          maximum: 100
+          examples:
+            - 50
+
+    Cmyk:
+      type: object
+      description: CMYK channels as percentages.
+      required:
+        - c
+        - m
+        - y
+        - k
+      properties:
+        c:
+          type: number
+          minimum: 0
+          maximum: 100
+          examples:
+            - 0
+        m:
+          type: number
+          minimum: 0
+          maximum: 100
+          examples:
+            - 100
+        y:
+          type: number
+          minimum: 0
+          maximum: 100
+          examples:
+            - 100
+        k:
+          type: number
+          minimum: 0
+          maximum: 100
+          examples:
+            - 0
+
+    ComplementaryColor:
+      type: object
+      description: |
+        The complementary color (`comp*`) and the nearest analogous alternative
+        (`near*` / `compNear*`).
+      required:
+        - compHex
+        - compName
+        - compNameEn
+        - compNearHex
+        - compNearName
+        - compNearNameEn
+        - compDistance
+        - compContrast
+        - compMix
+        - compTemp
+        - compTempVal
+        - nearDistance
+        - nearContrast
+        - nearMix
+        - nearTemp
+        - nearTempVal
+      properties:
+        compHex:
+          type: string
+          description: Complementary HEX without `#`.
+          pattern: '^[0-9a-fA-F]{6}$'
+          examples:
+            - 'f8b500'
+        compName:
+          type: string
+          description: Persian name of the complementary color.
+          examples:
+            - 'زرد طلایی'
+        compNameEn:
+          type: string
+          description: English name of the complementary color.
+          examples:
+            - 'Golden Yellow'
+        compNearHex:
+          type: string
+          description: Analogous alternative HEX without `#`.
+          pattern: '^[0-9a-fA-F]{6}$'
+          examples:
+            - '40a2e3'
+        compNearName:
+          type: string
+          description: Persian name of the analogous alternative.
+          examples:
+            - 'آبی فیروزه‌ای'
+        compNearNameEn:
+          type: string
+          description: English name of the analogous alternative.
+          examples:
+            - 'Turquoise Blue'
+        compDistance:
+          type: string
+          description: Perceptual distance from the input, normalized to `0–100`.
+          examples:
+            - '80.9'
+        compContrast:
+          type: string
+          description: Contrast score, normalized to `0–100`.
+          examples:
+            - '14.1'
+        compMix:
+          type: string
+          description: 50/50 RGB mix of the input and the complementary color.
+          pattern: '^#[0-9a-fA-F]{6}$'
+          examples:
+            - '#958E66'
+        compTemp:
+          type: string
+          description: |
+            Persian temperature label: `گرم` (warm), `سرد` (cool),
+            `میانه` (mid) or `خنثی` (achromatic).
+          examples:
+            - 'گرم'
+        compTempVal:
+          type: string
+          description: Hue in degrees as a string, or `خنثی` for achromatic colors.
+          examples:
+            - '44'
+        nearDistance:
+          type: string
+          description: Perceptual distance for the analogous alternative.
+          examples:
+            - '20.6'
+        nearContrast:
+          type: string
+          description: Contrast score for the analogous alternative.
+          examples:
+            - '9.1'
+        nearMix:
+          type: string
+          description: 50/50 RGB mix of the input and the analogous alternative.
+          pattern: '^#[0-9a-fA-F]{6}$'
+          examples:
+            - '#3A84D8'
+        nearTemp:
+          type: string
+          description: Persian temperature label for the analogous alternative.
+          examples:
+            - 'سرد'
+        nearTempVal:
+          type: string
+          description: Hue in degrees for the analogous alternative, or `خنثی`.
+          examples:
+            - '204'
+
+    ColorSummary:
+      type: object
+      description: A similar color entry. Relative URLs resolve against `https://kopolart.ir`.
+      required:
+        - span
+        - title
+        - image
+        - url
+        - captionImage
+        - dateTime
+      properties:
+        span:
+          type: string
+          description: Uppercase HEX of the suggested color.
+          examples:
+            - 'FF1818'
+        title:
+          type: string
+          description: Persian display title, usually with the English name in parentheses.
+          examples:
+            - 'رنگ قرمز (Red)'
+        image:
+          type: string
+          description: Relative image path. Prepend `https://kopolart.ir`.
+          examples:
+            - '/images/color-swatches/thumbnails/red-color-ff1818.jpg'
+        url:
+          type: string
+          description: Relative page path. Prepend `https://kopolart.ir`.
+          examples:
+            - '/colors/red-color-ff1818'
+        captionImage:
+          type: string
+          description: Persian caption / alt text.
+          examples:
+            - 'رنگ قرمز با کد FF1818'
+        dateTime:
+          type: string
+          description: Reserved field. Currently the default .NET date value.
+          examples:
+            - '0001-01-01T00:00:00'
+
+    PaletteSummary:
+      type: object
+      description: |
+        A similar palette entry. The `url` is a slug without a leading slash;
+        prepend `https://kopolart.ir/`.
+      required:
+        - span
+        - title
+        - image
+        - url
+        - captionImage
+        - dateTime
+      properties:
+        span:
+          type: string
+          description: Palette copy count, formatted with thousands separators.
+          examples:
+            - '3,326'
+        title:
+          type: string
+          description: Persian palette title.
+          examples:
+            - 'پالت رنگ نسکافه ای، قهوه‌ای، کرم و آبی نفتی'
+        image:
+          type: string
+          description: Relative image path. Prepend `https://kopolart.ir`.
+          examples:
+            - '/images/palettes/thumbnails/brown-petrol-blue-palette-865131.jpg'
+        url:
+          type: string
+          description: Palette slug without a leading slash.
+          examples:
+            - 'brown-petrol-blue-palette-865131'
+        captionImage:
+          type: string
+          description: Persian caption / alt text.
+          examples:
+            - 'پالت رنگ نسکافه ای، قهوه‌ای، کرمی و آبی نفتی'
+        dateTime:
+          type: string
+          description: Reserved field. Currently the default .NET date value.
+          examples:
+            - '0001-01-01T00:00:00'
+
+    LegacyColorProfile:
+      type: object
+      description: Compact, string-only profile returned by `/api-color/{hex}`.
+      required:
+        - message1
+        - message2
+        - message3
+      properties:
+        message1:
+          type: string
+          description: English descriptive name of the nearest catalog color.
+          examples:
+            - 'Pure Vibrant Red'
+        message2:
+          type: string
+          description: Dominant wavelength in nanometres, as a string.
+          examples:
+            - '611'
+        message3:
+          type: string
+          description: Excitation purity in percent, as a string.
+          examples:
+            - '91.7'
+
+    ProblemDetails:
+      type: object
+      description: RFC 9457 ProblemDetails object returned for invalid requests.
+      properties:
+        type:
+          type: string
+          description: URI identifying the problem type.
+          examples:
+            - 'https://tools.ietf.org/html/rfc9110#section-15.5.1'
+        title:
+          type: string
+          examples:
+            - 'Bad Request'
+        status:
+          type: integer
+          examples:
+            - 400
+        traceId:
+          type: string
+          description: Server trace identifier, useful when reporting an issue.
+          examples:
+            - '00-7f1f424232f4f6653689d6c924918dc0-174c508a684e2a67-00'
